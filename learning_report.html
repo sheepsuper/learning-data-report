@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习数据报告 · 2026年6月</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface-2: #1f2937;
+  --border: #1e293b;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-1: #818cf8;
+  --accent-2: #a78bfa;
+  --accent-3: #c084fc;
+  --gradient-1: linear-gradient(135deg, #6366f1, #a78bfa);
+  --gradient-2: linear-gradient(135deg, #0ea5e9, #6366f1);
+  --gradient-3: linear-gradient(135deg, #f59e0b, #ef4444);
+  --green: #34d399;
+  --yellow: #fbbf24;
+  --red: #f87171;
+  --card-radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+  line-height: 1.6; overflow-x: hidden;
+}
+.bg-glow-1 {
+  position: fixed; top: -30%; right: -20%; width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.bg-glow-2 {
+  position: fixed; bottom: -20%; left: -15%; width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(167,139,250,0.1) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+header {
+  position: relative; z-index: 1;
+  padding: 72px 24px 48px; text-align: center;
+  background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+}
+header .kicker {
+  display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent-1); margin-bottom: 16px;
+  padding: 4px 16px; border: 1px solid rgba(129,140,248,0.3); border-radius: 100px;
+}
+header h1 {
+  font-size: clamp(32px, 5vw, 56px); font-weight: 800; letter-spacing: -0.02em;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1.15;
+}
+header p { font-size: 16px; color: var(--text-secondary); margin-top: 12px; font-weight: 300; }
+.kpi-strip {
+  position: relative; z-index: 1;
+  display: flex; justify-content: center; gap: 12px;
+  padding: 24px 24px 0; max-width: 1200px; margin: 0 auto; flex-wrap: wrap;
+}
+.kpi-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px 28px; text-align: center;
+  min-width: 140px; flex: 1;
+  transition: all 0.3s ease;
+}
+.kpi-card:hover {
+  border-color: var(--accent-1); transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(99,102,241,0.1);
+}
+.kpi-card .value { font-size: 32px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.kpi-card .label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.3px; }
+.kpi-card .suffix { font-size: 14px; color: var(--accent-1); font-weight: 500; }
+.container { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 32px 20px 64px; }
+.section { margin-bottom: 48px; }
+.section-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.section-header .icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.section-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.section-header .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; margin-left: auto; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--card-radius); padding: 28px;
+  transition: all 0.3s ease;
+}
+.card:hover { border-color: rgba(129,140,248,0.2); }
+.card-title {
+  font-size: 14px; font-weight: 600; color: var(--text-secondary);
+  margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+}
+.card-title .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-full { grid-column: 1 / -1; }
+.chart-wrap { position: relative; height: 320px; }
+.chart-wrap.tall { height: 420px; }
+.chart-wrap.mid { height: 280px; }
+.chart-wrap.small { height: 200px; }
+.table-wrap {
+  max-height: 480px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.table-wrap::-webkit-scrollbar { width: 4px; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table th {
+  text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border);
+  font-weight: 600; color: var(--text-muted); font-size: 11px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  position: sticky; top: 0; background: var(--surface);
+}
+table td { padding: 10px 12px; border-bottom: 1px solid rgba(30,41,59,0.5); color: var(--text-secondary); }
+table tr:hover td { background: rgba(99,102,241,0.03); }
+.rank-num {
+  display: inline-flex; width: 24px; height: 24px;
+  align-items: center; justify-content: center; border-radius: 50%;
+  font-size: 11px; font-weight: 700;
+}
+.rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1c1917; }
+.rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+.rank-3 { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+.rank-other { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.compare-card { display: flex; flex-direction: column; gap: 10px; }
+.compare-row { display: flex; align-items: center; gap: 8px; }
+.compare-label { width: 36px; font-size: 11px; font-weight: 500; color: var(--text-secondary); text-align: right; }
+.compare-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden; position: relative; }
+.compare-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.compare-value { font-size: 11px; font-weight: 500; color: var(--text-secondary); width: 40px; text-align: right; }
+
+/* Animations */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-up { animation: fadeUp 0.6s ease forwards; }
+.fade-up-1 { animation: fadeUp 0.6s 0.1s ease both; }
+.fade-up-2 { animation: fadeUp 0.6s 0.15s ease both; }
+.fade-up-3 { animation: fadeUp 0.6s 0.2s ease both; }
+.fade-up-4 { animation: fadeUp 0.6s 0.25s ease both; }
+
+/* Custom bar */
+.bar-label-group { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+.bar-label-row { display: flex; justify-content: space-between; font-size: 11px; }
+.bar-label-row .name { color: var(--text-secondary); }
+.bar-label-row .val { color: var(--text); font-weight: 500; }
+.bar-track { height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+
+/* Insight callout */
+.insight {
+  background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 10px; padding: 16px 20px; margin-top: 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.insight .icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.insight .body { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+.insight .body strong { color: var(--text); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  header { padding: 40px 16px 32px; }
+  .kpi-card { min-width: 100px; padding: 14px 18px; }
+  .kpi-card .value { font-size: 24px; }
+  .card { padding: 20px; }
+  .container { padding: 24px 12px 40px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<header>
+  <div class="kicker fade-up">学习数据分析报告</div>
+  <h1 class="fade-up-1">Data Report</h1>
+  <p class="fade-up-2">统计截止 2026.06.08 · 共 15 个学习日</p>
+</header>
+
+<div class="kpi-strip">
+  <div class="kpi-card fade-up-1"><div class="value" id="kpiUsers"></div><div class="label">参与成员</div></div>
+  <div class="kpi-card fade-up-2"><div class="value" id="kpiRecords"></div><div class="label">学习记录</div></div>
+  <div class="kpi-card fade-up-3"><div class="value" id="kpiTopics"></div><div class="label">分享主题</div></div>
+  <div class="kpi-card fade-up-4"><div class="value"><span id="kpiCheckin"></span><span class="suffix">%</span></div><div class="label">平均签到率</div></div>
+</div>
+
+<div class="container">
+
+<!-- 积分排行 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-1);color:#fff;">🏆</div>
+    <h2>积分总排名</h2>
+    <span class="subtitle">按积分从高到低排列</span>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent-1)"></span>Points Leaderboard</div>
+    <div class="chart-wrap tall" id="chartPoints"></div>
+  </div>
+</div>
+
+<!-- 参与率 双图 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-2);color:#fff;">📊</div>
+    <h2>课程参与分析</h2>
+    <span class="subtitle">签到率 · 日记完成率 · 获赞分布</span>
+  </div>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>签到率</div>
+      <div class="chart-wrap mid" id="chartCheckin"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--yellow)"></span>日记完成率</div>
+      <div class="chart-wrap mid" id="chartDiary"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--red)"></span>获赞分布</div>
+      <div class="chart-wrap mid" id="chartLikes"></div>
+    </div>
+  </div>
+  <div class="insight fade-up">
+    <span class="icon">💡</span>
+    <div class="body">
+      <strong>「人性阻力」</strong>课程签到率虽达 91.7%，但日记完成率仅 <strong>12.5%</strong>（24 人中仅 3 人完成），显著低于其他课程（平均 >95%），建议重点关注该课程的内容设计与课后引导。
+    </div>
+  </div>
+</div>
+
+<!-- 价值观获得 堆叠 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-2);color:#fff;">💎</div>
+    <h2>价值观获得 · 分类堆叠</h2>
+    <span class="subtitle">六项价值观各项得分分布</span>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent-2)"></span>Values Received — Stacked Bar</div>
+    <div class="chart-wrap tall" id="chartValuesStacked"></div>
+  </div>
+</div>
+
+<!-- Top 5 雷达 + 获得/给予对比 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-3);color:#fff;">🔄</div>
+    <h2>价值观 · 获得与给予</h2>
+    <span class="subtitle">Top 5 雷达图 + 全员汇总对比</span>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--accent-3)"></span>Top 5 成员 · 六维雷达</div>
+      <div class="chart-wrap tall" id="chartRadar"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:var(--green)"></span>获得 vs 给予 · 累计对比</div>
+      <div class="chart-wrap small" id="chartRecGive"></div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text-muted);margin-bottom:8px">六项价值观明细</div>
+      <div id="compareBars" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 学习视频进度 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-1);color:#fff;">🎬</div>
+    <h2>学习视频进度</h2>
+    <span class="subtitle">视频学习进度分布</span>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#f59e0b"></span>进度分布（玫瑰图）</div>
+      <div class="chart-wrap tall" id="chartVideoProgress"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#6366f1"></span>单人进度 Top 10</div>
+      <div class="chart-wrap tall" id="chartVideoTop10"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 课程概览表 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-3);color:#fff;">📋</div>
+    <h2>课程概览</h2>
+    <span class="subtitle">15 门课程详细数据</span>
+  </div>
+  <div class="card">
+    <div class="table-wrap"><table id="courseTable"></table></div>
+  </div>
+</div>
+
+<!-- 积分排名表 -->
+<div class="section">
+  <div class="section-header">
+    <div class="icon" style="background:var(--gradient-3);color:#fff;">📋</div>
+    <h2>积分排名详情</h2>
+    <span class="subtitle">25 名成员完整排名</span>
+  </div>
+  <div class="card">
+    <div class="table-wrap"><table id="pointsTable"></table></div>
+  </div>
+</div>
+
+</div>
+
+<footer style="text-align:center;padding:32px 24px 48px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);position:relative;z-index:1">
+  学习数据统计报告 · 数据截止 2026.06.08 · Generated with Codex
+</footer>
+
+<script>
+// ======================== DATA ========================
+const DATA = {
+  userStats: [
+    {user:"吴章华",signin:8,diary:14,records:15,checkinRate:53.3,diaryRate:93.3,avgProg:402,likes:3},
+    {user:"陈培挺",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:26.1,likes:4},
+    {user:"Gary",signin:13,diary:14,records:15,checkinRate:86.7,diaryRate:93.3,avgProg:0,likes:12},
+    {user:"吴思怡",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:0.5,likes:6},
+    {user:"朱士玉",signin:15,diary:15,records:15,checkinRate:100,diaryRate:100,avgProg:0,likes:13},
+    {user:"王建淑",signin:14,diary:13,records:15,checkinRate:93.3,diaryRate:86.7,avgProg:0.5,likes:2},
+    {user:"朱超丹",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:0.1,likes:4},
+    {user:"吴承俊",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:83.6,likes:2},
+    {user:"单德轩",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:84.5,likes:3},
+    {user:"邓晓东",signin:9,diary:14,records:15,checkinRate:60,diaryRate:93.3,avgProg:0,likes:0},
+    {user:"金鼎强",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:230.1,likes:3},
+    {user:"许一九",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:16.2,likes:10},
+    {user:"张立响",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:11,likes:9},
+    {user:"张竹",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:0,likes:6},
+    {user:"陈鋆",signin:13,diary:14,records:15,checkinRate:86.7,diaryRate:93.3,avgProg:144.9,likes:4},
+    {user:"谭敦钊",signin:15,diary:15,records:15,checkinRate:100,diaryRate:100,avgProg:545.1,likes:9},
+    {user:"吴定康",signin:14,diary:11,records:15,checkinRate:93.3,diaryRate:73.3,avgProg:109.9,likes:0},
+    {user:"张奉天",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:111.6,likes:12},
+    {user:"汪建明",signin:15,diary:15,records:15,checkinRate:100,diaryRate:100,avgProg:271.7,likes:14},
+    {user:"宋晓林",signin:14,diary:14,records:15,checkinRate:93.3,diaryRate:93.3,avgProg:0.3,likes:10},
+    {user:"毛雪艳",signin:15,diary:14,records:15,checkinRate:100,diaryRate:93.3,avgProg:212.1,likes:5},
+    {user:"胡凡",signin:13,diary:12,records:13,checkinRate:100,diaryRate:92.3,avgProg:0,likes:6},
+    {user:"沈振鹏",signin:10,diary:14,records:15,checkinRate:66.7,diaryRate:93.3,avgProg:0,likes:3},
+    {user:"元宝",signin:13,diary:13,records:15,checkinRate:86.7,diaryRate:86.7,avgProg:2.5,likes:0},
+    {user:"王娜娜",signin:0,diary:0,records:1,checkinRate:0,diaryRate:0,avgProg:0,likes:0}
+  ],
+  courseStats: [
+    {name:"人性阻力",participants:24,signed:22,diaryDone:3,likes:0},
+    {name:"博弈论与生活",participants:24,signed:20,diaryDone:24,likes:0},
+    {name:"情绪：影响正确决策的变量",participants:24,signed:22,diaryDone:24,likes:0},
+    {name:"状态比能力更重要",participants:25,signed:23,diaryDone:24,likes:0},
+    {name:"别生气啦",participants:24,signed:21,diaryDone:24,likes:0},
+    {name:"逆风跑者：生死马拉松",participants:24,signed:23,diaryDone:24,likes:0},
+    {name:"业力管理",participants:24,signed:21,diaryDone:24,likes:0},
+    {name:"自信的陷阱",participants:24,signed:24,diaryDone:23,likes:0},
+    {name:"焦虑自救手册",participants:24,signed:22,diaryDone:22,likes:16},
+    {name:"终身成长",participants:24,signed:22,diaryDone:23,likes:3},
+    {name:"四解「我」是谁",participants:24,signed:21,diaryDone:24,likes:25},
+    {name:"一了一切了",participants:24,signed:22,diaryDone:24,likes:26},
+    {name:"连接与丰盛的生命智慧",participants:24,signed:22,diaryDone:24,likes:25},
+    {name:"穿越「我」的轮回",participants:23,signed:21,diaryDone:23,likes:35},
+    {name:"「我」的生命境界",participants:23,signed:21,diaryDone:23,likes:11}
+  ],
+  pointsData: [
+    {rank:1,user:"吴思怡",points:108},{rank:2,user:"许一九",points:106},
+    {rank:3,user:"Gary",points:102},{rank:4,user:"张奉天",points:98},
+    {rank:5,user:"朱士玉",points:97},{rank:6,user:"单德轩",points:97},
+    {rank:7,user:"汪建明",points:96},{rank:8,user:"谭敦钊",points:94},
+    {rank:9,user:"张立响",points:87},{rank:10,user:"吴承俊",points:86},
+    {rank:11,user:"朱超丹",points:82},{rank:12,user:"元宝",points:82},
+    {rank:13,user:"陈培挺",points:81},{rank:14,user:"沈振鹏",points:80},
+    {rank:15,user:"张竹",points:80},{rank:16,user:"陈鋆",points:79},
+    {rank:17,user:"宋晓林",points:79},{rank:18,user:"吴章华",points:77},
+    {rank:19,user:"邓晓东",points:76},{rank:20,user:"王建淑",points:75},
+    {rank:21,user:"金鼎强",points:75},{rank:22,user:"吴定康",points:72},
+    {rank:23,user:"毛雪艳",points:66},{rank:24,user:"胡凡",points:54},
+    {rank:25,user:"王娜娜",points:1}
+  ],
+  valRecv: [
+    {user:"吴思怡",开放:41,积极:55,担当:33,觉知:46,精进:37,大爱:35,合计:247},
+    {user:"许一九",开放:30,积极:45,担当:25,觉知:30,精进:27,大爱:27,合计:184},
+    {user:"张奉天",开放:36,积极:36,担当:27,觉知:29,精进:34,大爱:19,合计:181},
+    {user:"朱士玉",开放:32,积极:47,担当:21,觉知:32,精进:19,大爱:26,合计:177},
+    {user:"Gary",开放:28,积极:32,担当:20,觉知:30,精进:31,大爱:20,合计:161},
+    {user:"谭敦钊",开放:23,积极:40,担当:15,觉知:27,精进:18,大爱:17,合计:140},
+    {user:"汪建明",开放:24,积极:30,担当:23,觉知:22,精进:23,大爱:17,合计:139},
+    {user:"胡凡",开放:27,积极:43,担当:12,觉知:23,精进:18,大爱:14,合计:137},
+    {user:"宋晓林",开放:23,积极:28,担当:13,觉知:19,精进:19,大爱:11,合计:113},
+    {user:"单德轩",开放:27,积极:27,担当:15,觉知:18,精进:12,大爱:9,合计:108},
+    {user:"元宝",开放:12,积极:30,担当:16,觉知:22,精进:15,大爱:10,合计:105},
+    {user:"金鼎强",开放:15,积极:23,担当:14,觉知:17,精进:20,大爱:11,合计:100},
+    {user:"毛雪艳",开放:12,积极:29,担当:12,觉知:14,精进:14,大爱:6,合计:87},
+    {user:"吴承俊",开放:13,积极:22,担当:13,觉知:15,精进:13,大爱:8,合计:84},
+    {user:"沈振鹏",开放:15,积极:20,担当:11,觉知:15,精进:10,大爱:11,合计:82}
+  ],
+  valGive: [
+    {user:"许一九",开放:63,积极:65,担当:60,觉知:62,精进:63,大爱:62,合计:375},
+    {user:"吴思怡",开放:51,积极:91,担当:26,觉知:70,精进:76,大爱:28,合计:342},
+    {user:"汪建明",开放:55,积极:96,担当:39,觉知:43,精进:47,大爱:25,合计:305},
+    {user:"胡凡",开放:38,积极:65,担当:44,觉知:52,精进:35,大爱:25,合计:259},
+    {user:"张立响",开放:43,积极:40,担当:38,觉知:41,精进:39,大爱:40,合计:241},
+    {user:"谭敦钊",开放:25,积极:53,担当:16,觉知:16,精进:10,大爱:13,合计:133},
+    {user:"朱士玉",开放:25,积极:35,担当:15,觉知:34,精进:12,大爱:7,合计:128},
+    {user:"张奉天",开放:16,积极:26,担当:14,觉知:21,精进:20,大爱:11,合计:108},
+    {user:"沈振鹏",开放:22,积极:18,担当:16,觉知:16,精进:17,大爱:18,合计:107},
+    {user:"吴章华",开放:9,积极:9,担当:5,觉知:18,精进:21,大爱:6,合计:68}
+  ]
+};
+
+// ======================== KPI ========================
+document.getElementById('kpiUsers').textContent = DATA.userStats.length;
+document.getElementById('kpiRecords').textContent = DATA.userStats.reduce((s,u)=>s+u.records,0);
+document.getElementById('kpiTopics').textContent = DATA.courseStats.length;
+const avgCheck = DATA.userStats.reduce((s,u)=>s+u.checkinRate,0) / DATA.userStats.length;
+document.getElementById('kpiCheckin').textContent = avgCheck.toFixed(0);
+
+const vLabel = ['开放','积极','担当','觉知','精进','大爱'];
+const vColors = ['#f87171','#fb923c','#fbbf24','#34d399','#60a5fa','#a78bfa'];
+
+// ======================== ECharts Helper ========================
+function ec(id) { return echarts.init(document.getElementById(id)); }
+const ecTheme = {
+  text: '#94a3b8', grid: { containLabel: true },
+  split: { lineStyle: { color: 'rgba(255,255,255,0.04)' } }
+};
+
+// ======================== 1. POINTS ========================
+(function(){
+  const ch = ec('chartPoints');
+  const pts = DATA.pointsData;
+  ch.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' },
+      formatter: p => `<strong>${p[0].name}</strong><br/>积分：${p[0].value}` },
+    grid: { left: 50, right: 20, top: 10, bottom: 10, containLabel: true },
+    xAxis: { type: 'value', axisLabel: { color: ecTheme.text }, splitLine: ecTheme.split },
+    yAxis: {
+      type: 'category', data: pts.map(p=>p.user).reverse(),
+      axisLabel: { color: ecTheme.text, fontSize: 11 },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar', data: pts.map(p=>p.points).reverse(),
+      barWidth: 14,
+      itemStyle: {
+        borderRadius: [0,6,6,0],
+        color: p => {
+          const r = pts.length - p.dataIndex;
+          if (r === 1) return { type:'linear',x:0,y:0,x2:1,y2:0,
+            colorStops:[{offset:0,color:'rgba(245,158,11,0.6)'},{offset:1,color:'#f59e0b'}] };
+          if (r === 2) return { type:'linear',x:0,y:0,x2:1,y2:0,
+            colorStops:[{offset:0,color:'rgba(156,163,175,0.6)'},{offset:1,color:'#9ca3af'}] };
+          if (r === 3) return { type:'linear',x:0,y:0,x2:1,y2:0,
+            colorStops:[{offset:0,color:'rgba(217,119,6,0.6)'},{offset:1,color:'#d97706'}] };
+          return { type:'linear',x:0,y:0,x2:1,y2:0,
+            colorStops:[{offset:0,color:'rgba(99,102,241,0.4)'},{offset:1,color:'#6366f1'}] };
+        }
+      },
+      label: { show: true, position: 'right', color: ecTheme.text, fontSize: 11 }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 2. CHECKIN RATE (horiz bar) ========================
+(function(){
+  const ch = ec('chartCheckin');
+  const s = [...DATA.userStats].sort((a,b)=>b.checkinRate-a.checkinRate);
+  ch.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 5, right: 40, top: 5, bottom: 5, containLabel: true },
+    xAxis: { type: 'value', max: 100, axisLabel: { color: ecTheme.text, formatter:'{value}%' }, splitLine: ecTheme.split },
+    yAxis: { type: 'category', data: s.map(p=>p.user), axisLabel: { color: ecTheme.text, fontSize: 9 }, axisLine: { show:false }, axisTick: { show:false } },
+    series: [{
+      type: 'bar', data: s.map(p=>p.checkinRate), barWidth: 5, barGap: '60%',
+      itemStyle: { borderRadius: [0,3,3,0],
+        color: p => p.value >= 90 ? '#34d399' : p.value >= 50 ? '#fbbf24' : '#f87171'
+      }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 3. DIARY RATE (horiz bar) ========================
+(function(){
+  const ch = ec('chartDiary');
+  const s = [...DATA.userStats].sort((a,b)=>b.diaryRate-a.diaryRate);
+  ch.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 5, right: 40, top: 5, bottom: 5, containLabel: true },
+    xAxis: { type: 'value', max: 100, axisLabel: { color: ecTheme.text, formatter:'{value}%' }, splitLine: ecTheme.split },
+    yAxis: { type: 'category', data: s.map(p=>p.user), axisLabel: { color: ecTheme.text, fontSize: 9 }, axisLine: { show:false }, axisTick: { show:false } },
+    series: [{
+      type: 'bar', data: s.map(p=>p.diaryRate), barWidth: 5, barGap: '60%',
+      itemStyle: { borderRadius: [0,3,3,0],
+        color: p => p.value >= 90 ? '#34d399' : p.value >= 50 ? '#fbbf24' : '#f87171'
+      }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 4. LIKES ========================
+(function(){
+  const ch = ec('chartLikes');
+  const liked = DATA.courseStats.filter(c=>c.likes>0);
+  ch.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 20, right: 10, top: 5, bottom: 30, containLabel: true },
+    xAxis: { type: 'category',
+      data: liked.map(c=>c.name.length>8?c.name.slice(0,8)+'…':c.name),
+      axisLabel: { color: ecTheme.text, fontSize: 9, rotate: 20 },
+      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } }
+    },
+    yAxis: { type: 'value', axisLabel: { color: ecTheme.text }, splitLine: ecTheme.split },
+    series: [{
+      type: 'bar', data: liked.map(c=>c.likes), barWidth: 20,
+      itemStyle: {
+        borderRadius: [4,4,0,0],
+        color: { type:'linear',x:0,y:0,x2:0,y2:1,
+          colorStops:[{offset:0,color:'#f59e0b'},{offset:1,color:'#ef4444'}] }
+      },
+      label: { show: true, position: 'top', color: '#f59e0b', fontSize: 10 }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 5. VALUES STACKED ========================
+(function(){
+  const ch = ec('chartValuesStacked');
+  const vr = DATA.valRecv.filter(d=>d.合计>0);
+  ch.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    legend: { data: vLabel, textStyle: { color: ecTheme.text, fontSize: 11 }, top: 0 },
+    grid: { left: 50, right: 20, top: 36, bottom: 30, containLabel: true },
+    xAxis: { type: 'category', data: vr.map(d=>d.user), axisLabel: { color: ecTheme.text, fontSize: 10, rotate: 25 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } } },
+    yAxis: { type: 'value', axisLabel: { color: ecTheme.text }, splitLine: ecTheme.split },
+    series: vLabel.map((n,i) => ({
+      name: n, type: 'bar', stack: '总',
+      data: vr.map(d=>d[n]),
+      itemStyle: { color: vColors[i], borderRadius: 0 },
+      barWidth: 20
+    })).map((s,i,a) => {
+      if (i === 0) s.itemStyle.borderRadius = [0,0,0,4];
+      if (i === a.length-1) s.itemStyle.borderRadius = [4,4,0,0];
+      return s;
+    })
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 6. RADAR ========================
+(function(){
+  const ch = ec('chartRadar');
+  const top5 = DATA.valRecv.slice(0,5);
+  const maxVal = Math.max(...top5.flatMap(d=>vLabel.map(n=>d[n])));
+  const radarColors = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7'];
+  ch.setOption({
+    tooltip: {},
+    legend: { data: top5.map(d=>d.user), textStyle: { color: ecTheme.text, fontSize: 11 }, top: 0 },
+    radar: {
+      indicator: vLabel.map(n=>({name:n, max: maxVal+10})),
+      center: ['50%','55%'], radius: '55%',
+      axisName: { color: '#e0e6f0', fontSize: 12 },
+      splitArea: { areaStyle: { color: ['rgba(99,102,241,0.02)','rgba(99,102,241,0.04)'] } },
+      axisLine: { lineStyle: { color: 'rgba(99,102,241,0.15)' } },
+      splitLine: { lineStyle: { color: 'rgba(99,102,241,0.08)' } }
+    },
+    series: [{
+      type: 'radar',
+      data: top5.map((d,i) => ({
+        value: vLabel.map(n=>d[n]),
+        name: d.user,
+        areaStyle: { opacity: 0.08 },
+        lineStyle: { width: 2.5 },
+        itemStyle: { color: radarColors[i] }
+      }))
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 7. RECEIVE vs GIVE ========================
+(function(){
+  const ch = ec('chartRecGive');
+  const recTot = vLabel.map(n=>DATA.valRecv.reduce((s,d)=>s+(d[n]||0),0));
+  const giveTot = vLabel.map(n=>DATA.valGive.reduce((s,d)=>s+(d[n]||0),0));
+  ch.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['获得','给予'], textStyle: { color: ecTheme.text }, top: 0 },
+    grid: { left: 5, right: 10, top: 28, bottom: 5, containLabel: true },
+    xAxis: { type: 'category', data: vLabel, axisLabel: { color: ecTheme.text, fontSize: 11 }, axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } } },
+    yAxis: { type: 'value', axisLabel: { color: ecTheme.text }, splitLine: ecTheme.split },
+    series: [
+      { name:'获得', type:'bar', data: recTot, barWidth: 12,
+        itemStyle: { borderRadius: [3,3,0,0], color: '#6366f1' } },
+      { name:'给予', type:'bar', data: giveTot, barWidth: 12,
+        itemStyle: { borderRadius: [3,3,0,0], color: '#34d399' } }
+    ]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+
+  // Custom CSS bars
+  const cont = document.getElementById('compareBars');
+  const max = Math.max(...recTot, ...giveTot, 1);
+  vLabel.forEach((n,i) => {
+    const rPct = (recTot[i]/max*100).toFixed(0);
+    const gPct = (giveTot[i]/max*100).toFixed(0);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;flex-direction:column;gap:2px';
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:1px"><span>${n}</span></div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:10px;color:#6366f1;width:16px">获</span>
+        <div class="compare-bar-track"><div class="compare-bar" style="width:${rPct}%;background:#6366f1"></div></div>
+        <span style="font-size:10px;color:var(--text-secondary);width:28px;text-align:right">${recTot[i]}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span style="font-size:10px;color:#34d399;width:16px">给</span>
+        <div class="compare-bar-track"><div class="compare-bar" style="width:${gPct}%;background:#34d399"></div></div>
+        <span style="font-size:10px;color:var(--text-secondary);width:28px;text-align:right">${giveTot[i]}</span>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+})();
+
+// ======================== 8. VIDEO PROGRESS (Rose Pie) ========================
+(function(){
+  const ch = ec('chartVideoProgress');
+  const data = [
+    { name: '0% (无学习记录)', value: 310 },
+    { name: '0–100', value: 5 },
+    { name: '100–1000', value: 2 },
+    { name: '1000–3000', value: 3 },
+    { name: '3000+', value: 3 }
+  ];
+  const pieColors = ['#2d78ff','#00d4ff','#f59e0b','#7c3aed','#ef4444'];
+  ch.setOption({
+    tooltip: { trigger: 'item', formatter: '{b}：{c} 人次 ({d}%)' },
+    series: [{
+      type: 'pie', radius: ['30%','68%'], center: ['50%','50%'],
+      roseType: 'radius',
+      data: data,
+      label: { color: ecTheme.text, fontSize: 11 },
+      labelLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
+      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(99,102,241,0.3)' } },
+      itemStyle: { borderRadius: 4, color: p=>pieColors[p.dataIndex] }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 9. VIDEO TOP 10 ========================
+(function(){
+  const ch = ec('chartVideoTop10');
+  const progressData = [
+    {user:"谭敦钊",prog:5451},{user:"汪建明",prog:4144},
+    {user:"吴章华",prog:6030},{user:"毛雪艳",prog:3176},
+    {user:"陈鋆",prog:2173},{user:"张奉天",prog:1672},
+    {user:"吴定康",prog:1647},{user:"张立响",prog:105},
+    {user:"吴承俊",prog:84.5},{user:"单德轩",prog:84.5}
+  ].sort((a,b)=>b.prog-a.prog).slice(0,10);
+
+  ch.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: 50, right: 20, top: 10, bottom: 10, containLabel: true },
+    xAxis: { type: 'value', axisLabel: { color: ecTheme.text }, splitLine: ecTheme.split },
+    yAxis: {
+      type: 'category', data: progressData.map(d=>d.user).reverse(),
+      axisLabel: { color: ecTheme.text, fontSize: 11 },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar', data: progressData.map(d=>d.prog).reverse(), barWidth: 14,
+      itemStyle: {
+        borderRadius: [0,6,6,0],
+        color: { type:'linear',x:0,y:0,x2:1,y2:0,
+          colorStops:[{offset:0,color:'rgba(0,212,255,0.4)'},{offset:1,color:'#00d4ff'}] }
+      },
+      label: { show: true, position: 'right', color: ecTheme.text, fontSize: 10 }
+    }]
+  });
+  window.addEventListener('resize',()=>ch.resize());
+})();
+
+// ======================== 10. COURSE TABLE ========================
+(function(){
+  const c = DATA.courseStats;
+  let rows = c.map((r,i) => {
+    const signPct = (r.signed/r.participants*100).toFixed(0);
+    const diaryPct = (r.diaryDone/r.participants*100).toFixed(0);
+    return `<tr>
+      <td style="color:var(--text);font-weight:500">${i+1}</td>
+      <td style="color:var(--text)">${r.name}</td>
+      <td>${r.participants}</td>
+      <td>${r.signed} <span style="color:var(--text-muted);font-size:11px">(${signPct}%)</span></td>
+      <td>${r.diaryDone} <span style="color:var(--text-muted);font-size:11px">(${diaryPct}%)</span></td>
+      <td>${r.likes}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('courseTable').innerHTML = '<thead><tr><th>#</th><th>分享主题</th><th>参与</th><th>签到</th><th>日记完成</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody>';
+})();
+
+// ======================== 11. POINTS TABLE ========================
+(function(){
+  const rows = DATA.pointsData.map(p => {
+    const r = p.rank;
+    const cls = r <= 3 ? 'rank-'+r : 'rank-other';
+    return '<tr><td><span class="rank-num '+cls+'">'+r+'</span></td><td style="color:var(--text)">'+p.user+'</td><td style="font-weight:600;color:var(--text)">'+p.points+'</td></tr>';
+  }).join('');
+  document.getElementById('pointsTable').innerHTML = '<thead><tr><th>排名</th><th>用户</th><th>积分</th></tr></thead><tbody>'+rows+'</tbody>';
+})();
+</script>
+
+</body>
+</html>
